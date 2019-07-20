@@ -21,24 +21,41 @@
                 <th>Balance</th>
             </tr>
         </thead>
-        <tbody id="simpleList">
-            <tr><td colspan="3" class="table-secondary">Week of 1st July</td></tr>
-            <tr>
+        <thead class="thead-light">
+            <tr data-operator="+" data-value="500">
+                <th colspan="2">Week of 1st July</th>
+                <th>$500</th>
+            </tr>
+        </thead>
+        <tbody id="week-27">
+            <tr data-operator="+" data-value="500">
+                <td>Invoice 000003</td>
+                <td>+ $500</td>
+                <td>$1000</td>
+            </tr>
+            <tr data-operator="-" data-value="100">
                 <td>Electricity</td>
                 <td>- $100</td>
                 <td>$900</td>
             </tr>
-            <tr class="table-danger">
+            <tr class="table-danger" data-operator="-" data-value="100">
                 <td>Telecommunications</td>
                 <td>- $100</td>
                 <td>$900</td>
             </tr>
+        </tbody>
+        <thead class="thead-light">
             <tr>
+                <th colspan="2">Week of 1st July</th>
+                <th>$500</th>
+            </tr>
+        </thead>
+        <tbody id="week-28">
+            <tr data-operator="-" data-value="100">
                 <td>Rent</td>
                 <td>- $100</td>
                 <td>$900</td>
             </tr>
-            <tr><td colspan="3" class="table-secondary">Week of 8th July</td></tr>
         </tbody>
     </table>
 
@@ -51,8 +68,17 @@
     <script src="http://SortableJS.github.io/Sortable/Sortable.js"></script>
     <script>
         // Simple list
-        Sortable.create(simpleList, { /* options */ });
+        new Sortable.create(document.getElementById("week-27"), {
+            filter: ".table-secondary",
+            ghostClass: "table-primary",
+            group: "cashcal"
+        });
+        new Sortable.create(document.getElementById("week-28"), {
+            filter: ".table-secondary",
+            ghostClass: "table-primary",
+            group: "cashcal"
+        });
         // TODO On drag, add class "table-primary" to table-row that's being dragged
-    </script>`
+    </script>
   </body>
 </html>

@@ -22,23 +22,23 @@
             </tr>
         </thead>
         <thead class="thead-light">
-            <tr data-operator="+" data-value="500">
+            <tr data-balance="500">
                 <th colspan="2">Week of 1st July</th>
                 <th>$500</th>
             </tr>
         </thead>
         <tbody id="week-27">
-            <tr data-operator="+" data-value="500">
+            <tr data-value="500">
                 <td>Invoice 000003</td>
                 <td>+ $500</td>
                 <td>$1000</td>
             </tr>
-            <tr data-operator="-" data-value="100">
+            <tr data-value="-100">
                 <td>Electricity</td>
                 <td>- $100</td>
                 <td>$900</td>
             </tr>
-            <tr class="table-danger" data-operator="-" data-value="100">
+            <tr class="table-danger" data-value="-100">
                 <td>Telecommunications</td>
                 <td>- $100</td>
                 <td>$900</td>
@@ -51,7 +51,7 @@
             </tr>
         </thead>
         <tbody id="week-28">
-            <tr data-operator="-" data-value="100">
+            <tr data-value="-100">
                 <td>Rent</td>
                 <td>- $100</td>
                 <td>$900</td>
@@ -67,6 +67,25 @@
     <!-- then Sortable.js -->
     <script src="http://SortableJS.github.io/Sortable/Sortable.js"></script>
     <script>
+        function updateBalances() {
+            var balance = +document.querySelector("tr[data-balance]").dataset.balance, // only one element should have a data-balance attribute at the start
+                transaction = document.querySelectorAll("tr[data-value]"),
+                i = 0;
+
+            console.log(balance);
+
+            for (i = 0; i < transaction.length; i += 1) {
+                balance = balance + +transaction[i].dataset.value ;
+                $(transaction[i]).children().last().text("$" + balance);
+                console.log(balance);
+            }
+        }
+
+        !function main() {
+            updateBalances();
+        }();
+    </script>
+    <script>
         // Simple list
         new Sortable.create(document.getElementById("week-27"), {
             filter: ".table-secondary",
@@ -78,7 +97,6 @@
             ghostClass: "table-primary",
             group: "cashcal"
         });
-        // TODO On drag, add class "table-primary" to table-row that's being dragged
     </script>
   </body>
 </html>

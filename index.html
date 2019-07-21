@@ -24,23 +24,18 @@
         <thead class="thead-light">
             <tr data-balance="500">
                 <th colspan="2">Week of 1st July</th>
-                <th>$500</th>
+                <th><span style="color: #e9ecef">&minus;</span> $500</th>
             </tr>
         </thead>
         <tbody id="week-27">
-            <tr data-value="500">
-                <td>Invoice 000003</td>
-                <td>+ $500</td>
-                <td></td>
-            </tr>
-            <tr data-value="-100">
+            <tr data-value="-500">
                 <td>Electricity</td>
-                <td>- $100</td>
+                <td></td>
                 <td></td>
             </tr>
-            <tr class="table-danger" data-value="-100">
-                <td>Telecommunications</td>
-                <td>- $100</td>
+            <tr data-value="-200">
+                <td>Telephone</td>
+                <td></td>
                 <td></td>
             </tr>
         </tbody>
@@ -50,9 +45,14 @@
             </tr>
         </thead>
         <tbody id="week-28">
-            <tr data-value="-100">
+            <tr data-value="-1000">
                 <td>Rent</td>
-                <td>- $100</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr data-value="500">
+                <td>Invoice 000003</td>
+                <td></td>
                 <td></td>
             </tr>
         </tbody>
@@ -69,19 +69,47 @@
         function updateBalances() {
             var balance = +document.querySelector("tr[data-balance]").dataset.balance, // only one element should have a data-balance attribute at the start
                 transaction = document.querySelectorAll("tr[data-value]"),
+                value = 0,
                 i = 0;
 
-            console.log(balance);
+            for (i = 0; i < transaction.length; i += 1) {
+                value = +transaction[i].dataset.value;
+                balance = balance + value,
+                insert = balance + ""; // cast as string
+
+                if (balance < 0) {
+                    insert = "&minus; $" + insert.slice(1);
+                } else {
+                    insert = "<span style=\"color:white\">+</span> $" + insert;
+                }
+                $(transaction[i]).children().last().html(insert);
+
+                if (balance < 0 && value < 0) {
+                    $(transaction[i]).addClass("table-danger");
+                } else {
+                    $(transaction[i]).removeClass("table-danger");
+                }
+            }
+        }
+
+        function updateValues() { // can use this to update opening balances as well
+            var transaction = document.querySelectorAll("tr[data-value]"),
+                i = 0;
 
             for (i = 0; i < transaction.length; i += 1) {
-                balance = balance + +transaction[i].dataset.value ;
-                $(transaction[i]).children().last().text("$" + balance);
-                console.log(balance);
+                value = transaction[i].dataset.value;
+                if (value < 0) {
+                    value = "<span style=\"color:red\">&minus;</span> $" + value.slice(1);
+                } else {
+                    value = "<span style=\"color:green\">+</span> $" + value;
+                }
+                $(transaction[i]).children().eq(1).html(value);
             }
         }
 
         !function main() {
             updateBalances();
+            updateValues();
         }();
     </script>
     <script>

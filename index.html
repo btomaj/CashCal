@@ -11,7 +11,12 @@
     <title>CashCal</title>
   </head>
   <body>
-    <h1>CashCal</h1>
+    <div class="modal-header">
+    <h5 class="modal-title">CashCal <small class="text-muted">by Westpac</small></h5>
+    <button type="button" class="close" aria-label="Add transaction" data-toggle="modal" data-target="#addTransaction">
+      <span aria-hidden="true">+</span>
+    </button>
+    </div>
 
     <table class="table">
         <thead>
@@ -57,6 +62,69 @@
             </tr>
         </tbody>
     </table>
+
+    <div id="addTransaction" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add a transaction</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="addTransactionForm">
+              <div class="form-group">
+                <label for="transactionName">Label</label>
+                <input type="text" class="form-control" id="transactionName" placeholder="E.g. Electricity" required>
+              </div>
+              <div class="form-group">
+                  <label for="transactionValue">Amount</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" id="inputGroupPrepend">$</span>
+                    </div>
+                    <input type="text" class="form-control" id="transactionValue" name="transactionValue" placeholder="E.g. -100" required>
+                  </div>
+              </div>
+              </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" form="addTransactionForm" class="btn btn-primary">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (function() {
+      'use strict';
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var form = document.querySelector('#addTransactionForm');
+        // Loop over them and prevent submission
+          form.addEventListener('submit', function(event) {
+            if (form.checkValidity() === false) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+          }, false);
+    })();
+    </script>
+    <style>
+        .modal-dialog {
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          padding: 0;
+        }
+
+        .modal-content {
+          height: auto;
+          min-height: 100%;
+          border-radius: 0;
+        }
+    </style>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

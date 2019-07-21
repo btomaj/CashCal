@@ -96,20 +96,6 @@
       </div>
     </div>
     <script>
-    // Example starter JavaScript for disabling form submissions if there are invalid fields
-    (function() {
-      'use strict';
-        // Fetch all the forms we want to apply custom Bootstrap validation styles to
-        var form = document.querySelector('#addTransactionForm');
-        // Loop over them and prevent submission
-          form.addEventListener('submit', function(event) {
-            if (form.checkValidity() === false) {
-              event.preventDefault();
-              event.stopPropagation();
-            }
-            form.classList.add('was-validated');
-          }, false);
-    })();
     </script>
     <style>
         .modal-dialog {
@@ -178,6 +164,17 @@
         !function main() {
             updateBalances();
             updateValues();
+            // Example starter JavaScript for disabling form submissions if there are invalid fields
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var form = document.querySelector('#addTransactionForm');
+            // Loop over them and prevent submission
+            $("#addTransaction button").click(function (event) {
+                if (form.checkValidity() === false) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+              });
         }();
     </script>
     <script>

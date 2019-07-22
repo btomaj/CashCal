@@ -168,13 +168,17 @@
             // Fetch all the forms we want to apply custom Bootstrap validation styles to
             var form = document.querySelector('#addTransactionForm');
             // Loop over them and prevent submission
-            $("#addTransaction button").click(function (event) {
+            $("#addTransaction .modal-footer button").click(function (event) {
                 if (form.checkValidity() === false) {
                   event.preventDefault();
                   event.stopPropagation();
                 }
                 form.classList.add('was-validated');
-              });
+            });
+            $("#addTransaction .modal-header button").click(function (event) {
+                form.reset();
+                form.classList.remove('was-validated');
+            });
         }();
     </script>
     <script>

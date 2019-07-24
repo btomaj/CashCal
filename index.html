@@ -102,28 +102,31 @@
         var week27 = new CashCal.Week(27),
             week28 = new CashCal.Week(28),
 
-            electricity = new CashCal.Transaction("Electricity", -500),
-            telephone = new CashCal.Transaction("Telephone", -200),
-            rent = new CashCal.Transaction("Rent", -1000),
-            invoice3 = new CashCal.Transaction("Invoice 000003", 500),
+            uber = new CashCal.Transaction("Uber (June)", -500),
+            djcity = new CashCal.Transaction("DJ City", -200),
+            btinsurance = new CashCal.Transaction("BT Insurance", -400),
+            drew = new CashCal.Transaction("Invoice to Drew", 500),
+            quentin = new CashCal.Transaction("Invoice to Quentin", 1000),
 
             week27View = new CashCal.WeekView(week27),
             week28View = new CashCal.WeekView(week28),
 
-            electricityView = new CashCal.TransactionView(electricity),
-            telephoneView = new CashCal.TransactionView(telephone),
-            rentView = new CashCal.TransactionView(rent),
-            invoice3View = new CashCal.TransactionView(invoice3),
+            uberView = new CashCal.TransactionView(uber),
+            djcityView = new CashCal.TransactionView(djcity),
+            btinsuranceView = new CashCal.TransactionView(btinsurance),
+            drewView = new CashCal.TransactionView(drew),
+            quentinView = new CashCal.TransactionView(quentin),
 
             forecastView = new CashCal.ForecastView($("table"));
 
             forecastView.addWeek(week27View);
-            week27View.addTransaction(electricityView);
-            week27View.addTransaction(telephoneView);
+            week27View.addTransaction(uberView);
+            week27View.addTransaction(djcityView);
 
             forecastView.addWeek(week28View);
-            week28View.addTransaction(rentView);
-            week28View.addTransaction(invoice3View);
+            week28View.addTransaction(btinsuranceView);
+            week28View.addTransaction(drewView);
+            week28View.addTransaction(quentinView);
 
         function updateBalances() {
             var balance = +document.querySelector("tr[data-balance]").dataset.balance, // only one element should have a data-balance attribute at the start

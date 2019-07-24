@@ -252,14 +252,17 @@ CashCal.WeekView = (function () {
 
         transactions.attr("id", "week-" + Week.weekNumber);
 
-        this.html = header.add(transactions);
+        weekEntry = header.add(transactions);
 
-        // TODO automatically include existing transactions
-
-        this.addTransaction = function addTransaction(TransactionView) {
+        weekEntry.addTransaction = function addTransaction(TransactionView) {
             transactions.append(TransactionView);
             // TODO update balance
         };
+
+        return weekEntry;
+
+        // TODO automatically include existing transactions
+
     };
 }());
 
@@ -280,7 +283,7 @@ CashCal.ForecastView = (function () {
         }
 
         this.addWeek = function addWeek(WeekView) {
-            table.append(WeekView.html);
+            table.append(WeekView);
         };
     };
 }());

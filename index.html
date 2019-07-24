@@ -104,7 +104,7 @@
               </form>
           </div>
           <div class="modal-footer">
-            <button type="button" form="addTransactionForm" class="btn btn-primary">Add</button>
+            <button type="submit" form="addTransactionForm" class="btn btn-primary">Add</button>
           </div>
         </div>
       </div>
@@ -166,18 +166,22 @@
             updateValues();
             // Example starter JavaScript for disabling form submissions if there are invalid fields
             // Fetch all the forms we want to apply custom Bootstrap validation styles to
-            var form = document.querySelector('#addTransactionForm');
-            // Loop over them and prevent submission
-            $("#addTransaction .modal-footer button").click(function (event) {
-                if (form.checkValidity() === false) {
-                  event.preventDefault();
-                  event.stopPropagation();
-                }
-                form.classList.add('was-validated');
+            $("#addTransactionForm").submit(function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                $("tbody").last().append(
+                    $(document.createElement("tr")).attr("data-value", $(this).find("#transactionValue").val()).append(
+                        $(document.createElement("td")).text($(this).find("#transactionName").val()),
+                        $(document.createElement("td")),
+                        $(document.createElement("td"))
+                    )
+                );
+                $("#addTransaction .modal-header button").trigger("click");
+                updateBalances();
+                updateValues();
             });
             $("#addTransaction .modal-header button").click(function (event) {
-                form.reset();
-                form.classList.remove('was-validated');
+                $("#addTransactionForm").trigger("reset");
             });
         }();
     </script>

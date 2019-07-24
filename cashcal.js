@@ -204,12 +204,10 @@ CashCal.TransactionView = (function () {
         var transactionEntry = $(document.createElement("tr"));
         transactionEntry.attr("data-value", Transaction.value);
         transactionEntry.append(
-            document.createElement("td"),
+            $(document.createElement("td")).text(Transaction.name),
             document.createElement("td"),
             document.createElement("td")
         );
-
-        transactionEntry.children().first().text(Transaction.name);
 
         return transactionEntry;
     };

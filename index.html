@@ -8,6 +8,11 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <style>
+        .thead-light tr th:last-child:before {
+          content: "\2212\00A0";
+          color: #e9ecef;
+        }
+
         .modal-dialog {
           width: 100%;
           height: 100%;
@@ -40,6 +45,7 @@
                 <th>Balance</th>
             </tr>
         </thead>
+<<<<<<< Updated upstream
         <thead class="thead-light">
             <tr data-balance="500">
                 <th colspan="2">Week of 1st July</th>
@@ -75,6 +81,8 @@
                 <td></td>
             </tr>
         </tbody>
+=======
+>>>>>>> Stashed changes
     </table>
 
     <div id="addTransaction" class="modal" tabindex="-1" role="dialog">
@@ -118,8 +126,47 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <!-- then Sortable.js -->
+<<<<<<< Updated upstream
     <script src="https://SortableJS.github.io/Sortable/Sortable.js"></script>
+=======
+    <script src="http://SortableJS.github.io/Sortable/Sortable.js"></script>
+    <script src="cashcal.js"></script>
+>>>>>>> Stashed changes
     <script>
+        var appMain = new CashCal.ForecastController(new CashCal.ForecastView($("table")));
+        
+        
+        appMain.addWeek(27);
+        appMain.addWeek(28);
+        appMain.addWeek(30);
+        appMain.addTransaction(30, "test", 100);
+
+        var week27 = new CashCal.Week(27),
+            week28 = new CashCal.Week(28),
+
+            electricity = new CashCal.Transaction("Electricity", -500),
+            telephone = new CashCal.Transaction("Telephone", -200),
+            rent = new CashCal.Transaction("Rent", -1000),
+            invoice3 = new CashCal.Transaction("Invoice 000003", 500),
+
+            week27View = new CashCal.WeekView(week27),
+            week28View = new CashCal.WeekView(week28),
+
+            electricityView = new CashCal.TransactionView(electricity),
+            telephoneView = new CashCal.TransactionView(telephone),
+            rentView = new CashCal.TransactionView(rent),
+            invoice3View = new CashCal.TransactionView(invoice3),
+
+            forecastView = new CashCal.ForecastView($("table"));
+
+            forecastView.addWeek(week27View);
+            week27View.addTransaction(electricityView);
+            week27View.addTransaction(telephoneView);
+
+            forecastView.addWeek(week28View);
+            week28View.addTransaction(rentView);
+            week28View.addTransaction(invoice3View);
+
         function updateBalances() {
             var balance = +document.querySelector("tr[data-balance]").dataset.balance, // only one element should have a data-balance attribute at the start
                 transaction = document.querySelectorAll("tr[data-value]"),

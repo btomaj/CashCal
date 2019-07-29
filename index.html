@@ -8,6 +8,11 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <style>
+        .thead-light tr th:last-child:before {
+          content: "\2212\00A0";
+          color: #e9ecef;
+        }
+
         .modal-dialog {
           width: 100%;
           height: 100%;
@@ -40,46 +45,6 @@
                 <th>Balance</th>
             </tr>
         </thead>
-        <thead class="thead-light">
-            <tr data-balance="500">
-                <th colspan="2">Week of 1st July</th>
-                <th><span style="color: #e9ecef">&minus;</span> $500</th>
-            </tr>
-        </thead>
-        <tbody id="week-27">
-            <tr data-value="-500">
-                <td>Uber (June)</td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr data-value="-200">
-                <td>JB Hi-Fi</td>
-                <td></td>
-                <td></td>
-            </tr>
-        </tbody>
-        <thead class="thead-light">
-            <tr>
-                <th colspan="3">Week of 8th July</th>
-            </tr>
-        </thead>
-        <tbody id="week-28">
-            <tr data-value="-400">
-                <td>BT Insurance</td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr data-value="500">
-                <td>Invoice to Drew</td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr data-value="1000">
-                <td>Invoice to Quentin</td>
-                <td></td>
-                <td></td>
-            </tr>
-        </tbody>
     </table>
 
     <div id="addTransaction" class="modal" tabindex="-1" role="dialog">
@@ -124,7 +89,25 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <!-- then Sortable.js -->
     <script src="https://SortableJS.github.io/Sortable/Sortable.js"></script>
+    <script src="cashcal.js"></script>
     <script>
+        var appMain = new CashCal.ForecastController(
+                new CashCal.Forecast(),
+                new CashCal.ForecastView($("table"))
+            );
+        
+
+        appMain.addWeek(27);
+        appMain.addTransaction(27, "Uber (June)", -500);
+        appMain.addTransaction(27, "DJ City", -200);
+
+        appMain.addWeek(28);
+        appMain.addTransaction(28, "BT Insurance", -400);
+        appMain.addTransaction(28, "Invoice to Drew", 500);
+        appMain.addTransaction(28, "Invoice to Quentin", 1000);
+
+
+
         function updateBalances() {
             var balance = +document.querySelector("tr[data-balance]").dataset.balance, // only one element should have a data-balance attribute at the start
                 transaction = document.querySelectorAll("tr[data-value]"),
@@ -166,28 +149,30 @@
             }
         }
 
+        $("#addTransactionForm").submit(function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            var transaction = new CashCal.Transaction($(this).find("#transactionName").val(), $(this).find("#transactionValue").val());
+
+            $("tbody").last().append(
+                $(document.createElement("tr")).attr("data-value", $(this).find("#transactionValue").val()).append(
+                    $(document.createElement("td")).text($(this).find("#transactionName").val()),
+                    $(document.createElement("td")),
+                    $(document.createElement("td"))
+                )
+            );
+            $("#addTransaction .modal-header button").trigger("click");
+            updateBalances();
+            updateValues();
+        });
+        $("#addTransaction .modal-header button").click(function (event) {
+            $("#addTransactionForm").trigger("reset");
+        });
+
         !function main() {
             updateBalances();
             updateValues();
-            // Example starter JavaScript for disabling form submissions if there are invalid fields
-            // Fetch all the forms we want to apply custom Bootstrap validation styles to
-            $("#addTransactionForm").submit(function (event) {
-                event.preventDefault();
-                event.stopPropagation();
-                $("tbody").last().append(
-                    $(document.createElement("tr")).attr("data-value", $(this).find("#transactionValue").val()).append(
-                        $(document.createElement("td")).text($(this).find("#transactionName").val()),
-                        $(document.createElement("td")),
-                        $(document.createElement("td"))
-                    )
-                );
-                $("#addTransaction .modal-header button").trigger("click");
-                updateBalances();
-                updateValues();
-            });
-            $("#addTransaction .modal-header button").click(function (event) {
-                $("#addTransactionForm").trigger("reset");
-            });
         }();
     </script>
     <script>

@@ -195,6 +195,23 @@ CashCal.ForecastController = (function () {
 CashCal.TransactionView = (function () {
     "use strict";
 
+    var mutationObserver = new MutationObserver(function (mutations) {
+            var value,
+                i;
+            for (i of mutations) {
+                if (i.type === "attributes" &&
+                        i.attributeName === "data-value") {
+                    value = $(i.target).attr(i.attributeName);
+                    if (value < 0) {
+                        value = "<span style=\"color:red\">&minus;</span> $" + value.slice(1);
+                    } else {
+                        value = "<span style=\"color:green\">+</span> $" + value;
+                    }
+                    $(i.target).children().eq(1).html(value);
+                }
+            }
+        });
+
     return function TransactionView(Transaction) {
 
         if (!(this instanceof CashCal.TransactionView)) {
@@ -202,12 +219,17 @@ CashCal.TransactionView = (function () {
         }
 
         var transactionEntry = $(document.createElement("tr"));
-        transactionEntry.attr("data-value", Transaction.value);
         transactionEntry.append(
             $(document.createElement("td")).text(Transaction.name),
             document.createElement("td"),
             document.createElement("td")
         );
+        mutationObserver.observe(transactionEntry[0], {
+            attributes: true,
+            childList: false,
+            subtree: false
+        });
+        transactionEntry.attr("data-value", Transaction.value);
 
         return transactionEntry;
     };

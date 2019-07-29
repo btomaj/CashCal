@@ -91,42 +91,22 @@
     <script src="https://SortableJS.github.io/Sortable/Sortable.js"></script>
     <script src="cashcal.js"></script>
     <script>
-        var appMain = new CashCal.ForecastController(new CashCal.ForecastView($("table")));
+        var appMain = new CashCal.ForecastController(
+                new CashCal.Forecast(),
+                new CashCal.ForecastView($("table"))
+            );
         
-        
+
         appMain.addWeek(27);
+        appMain.addTransaction(27, "Uber (June)", -500);
+        appMain.addTransaction(27, "DJ City", -200);
+
         appMain.addWeek(28);
-        appMain.addWeek(30);
-        appMain.addTransaction(30, "test", 100);
+        appMain.addTransaction(28, "BT Insurance", -400);
+        appMain.addTransaction(28, "Invoice to Drew", 500);
+        appMain.addTransaction(28, "Invoice to Quentin", 1000);
 
-        var week27 = new CashCal.Week(27),
-            week28 = new CashCal.Week(28),
 
-            uber = new CashCal.Transaction("Uber (June)", -500),
-            djcity = new CashCal.Transaction("DJ City", -200),
-            btinsurance = new CashCal.Transaction("BT Insurance", -400),
-            drew = new CashCal.Transaction("Invoice to Drew", 500),
-            quentin = new CashCal.Transaction("Invoice to Quentin", 1000),
-
-            week27View = new CashCal.WeekView(week27),
-            week28View = new CashCal.WeekView(week28),
-
-            uberView = new CashCal.TransactionView(uber),
-            djcityView = new CashCal.TransactionView(djcity),
-            btinsuranceView = new CashCal.TransactionView(btinsurance),
-            drewView = new CashCal.TransactionView(drew),
-            quentinView = new CashCal.TransactionView(quentin),
-
-            forecastView = new CashCal.ForecastView($("table"));
-
-            forecastView.addWeek(week27View);
-            week27View.addTransaction(uberView);
-            week27View.addTransaction(djcityView);
-
-            forecastView.addWeek(week28View);
-            week28View.addTransaction(btinsuranceView);
-            week28View.addTransaction(drewView);
-            week28View.addTransaction(quentinView);
 
         function updateBalances() {
             var balance = +document.querySelector("tr[data-balance]").dataset.balance, // only one element should have a data-balance attribute at the start
@@ -169,28 +149,30 @@
             }
         }
 
+        $("#addTransactionForm").submit(function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            var transaction = new CashCal.Transaction($(this).find("#transactionName").val(), $(this).find("#transactionValue").val());
+
+            $("tbody").last().append(
+                $(document.createElement("tr")).attr("data-value", $(this).find("#transactionValue").val()).append(
+                    $(document.createElement("td")).text($(this).find("#transactionName").val()),
+                    $(document.createElement("td")),
+                    $(document.createElement("td"))
+                )
+            );
+            $("#addTransaction .modal-header button").trigger("click");
+            updateBalances();
+            updateValues();
+        });
+        $("#addTransaction .modal-header button").click(function (event) {
+            $("#addTransactionForm").trigger("reset");
+        });
+
         !function main() {
             updateBalances();
             updateValues();
-            // Example starter JavaScript for disabling form submissions if there are invalid fields
-            // Fetch all the forms we want to apply custom Bootstrap validation styles to
-            $("#addTransactionForm").submit(function (event) {
-                event.preventDefault();
-                event.stopPropagation();
-                $("tbody").last().append(
-                    $(document.createElement("tr")).attr("data-value", $(this).find("#transactionValue").val()).append(
-                        $(document.createElement("td")).text($(this).find("#transactionName").val()),
-                        $(document.createElement("td")),
-                        $(document.createElement("td"))
-                    )
-                );
-                $("#addTransaction .modal-header button").trigger("click");
-                updateBalances();
-                updateValues();
-            });
-            $("#addTransaction .modal-header button").click(function (event) {
-                $("#addTransactionForm").trigger("reset");
-            });
         }();
     </script>
     <script>

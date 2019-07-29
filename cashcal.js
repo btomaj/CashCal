@@ -168,21 +168,21 @@ CashCal.WeekController = (function () {
 CashCal.ForecastController = (function () {
     "use strict";
 
-    return function ForecastController(view) {
+    return function ForecastController(Forecast, ForecastView) {
 
         if (!(this instanceof CashCal.ForecastController)) {
-            return new CashCal.ForecastControlle(view);
+            return new CashCal.ForecastControlle(ForecastView);
         }
 
-        var week = [],
-            transaction = [];
+        var week = [];
 
         this.addWeek = function addWeek(weekNumber) {
             var weekModel = new CashCal.Week(weekNumber),
                 weekView = new CashCal.WeekView(weekModel);
 
             week[weekNumber] = new CashCal.WeekController(weekModel, weekView);
-            view.addWeek(weekView);
+            Forecast.addWeek(weekModel);
+            ForecastView.addWeek(weekView);
         };
 
         this.addTransaction = function addTransaction(weekNumber, name, value) {

@@ -117,14 +117,7 @@
             for (i = 0; i < transaction.length; i += 1) {
                 value = +transaction[i].dataset.value;
                 balance = balance + value,
-                insert = balance + ""; // cast as string
-
-                if (balance < 0) {
-                    insert = "&minus; $" + insert.slice(1);
-                } else {
-                    insert = "<span style=\"color:white\">+</span> $" + insert;
-                }
-                $(transaction[i]).children().last().html(insert);
+                $(transaction[i]).attr("data-balance", balance);
 
                 if (balance < 0 && value < 0) {
                     $(transaction[i]).addClass("table-danger");

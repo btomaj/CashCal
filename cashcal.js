@@ -199,15 +199,27 @@ CashCal.TransactionView = (function () {
             var value,
                 i;
             for (i of mutations) {
-                if (i.type === "attributes" &&
-                        i.attributeName === "data-value") {
-                    value = $(i.target).attr(i.attributeName);
-                    if (value < 0) {
-                        value = "<span style=\"color:red\">&minus;</span> $" + value.slice(1);
-                    } else {
-                        value = "<span style=\"color:green\">+</span> $" + value;
+                if (i.type === "attributes") {
+                    switch (i.attributeName) {
+                        case "data-value":
+                            value = $(i.target).attr(i.attributeName);
+                            if (value < 0) {
+                                value = "<span style=\"color:red\">&minus;</span> $" + value.slice(1);
+                            } else {
+                                value = "<span style=\"color:green\">+</span> $" + value;
+                            }
+                            $(i.target).children().eq(1).html(value);
+                            break;
+                        case "data-balance":
+                            value = $(i.target).attr(i.attributeName);
+                            if (value < 0) {
+                                value = "&minus; $" + value.slice(1);
+                            } else {
+                                value = "<span style=\"color:white\">+</span> $" + value;
+                            }
+                            $(i.target).children().last().html(value);
+                            break;
                     }
-                    $(i.target).children().eq(1).html(value);
                 }
             }
         });

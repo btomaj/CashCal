@@ -8,11 +8,6 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
     <style>
-        .thead-light tr th:last-child:before {
-          content: "\2212\00A0";
-          color: #e9ecef;
-        }
-
         .modal-dialog {
           width: 100%;
           height: 100%;
@@ -96,6 +91,7 @@
                 new CashCal.ForecastView($("table"))
             );
         
+        appMain.setOpeningBalance(500);
 
         appMain.addWeek(27);
         appMain.addTransaction(27, "Uber (June)", -500);
@@ -105,7 +101,6 @@
         appMain.addTransaction(28, "BT Insurance", -400);
         appMain.addTransaction(28, "Invoice to Drew", 500);
         appMain.addTransaction(28, "Invoice to Quentin", 1000);
-
 
 
         function updateBalances() {

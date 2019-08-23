@@ -82,8 +82,6 @@ CashCal.Week = (function () {
 
         this.weekNumber = weekNumber;
         this.weekStart = getDateOfISOWeek(weekNumber, new Date().getFullYear());
-        this.openingBalance = 0; //TODO get opening balance from previous week
-        this.closingBalance = 0;
         this.transactions = [];
         this.addTransaction = function addTransaction(Transaction, index) {
             index = (index > -1) ? index : this.transactions.length;
@@ -100,13 +98,6 @@ CashCal.Week = (function () {
                     this.transactions);
                 // TODO Notify controller about updated balance
                 // TODO record balances after each transaction for each txn?
-        },
-        this.setOpeningBalance = function setOpeningBalance(balance) {
-            this.openingBalance = balance;
-            this.closingBalance = calculateBalance(this.openingBalance,
-                    this.transactions);
-                // TODO Notify controller about updated balance
-                // TODO record balances after each transaction for each txn?
         };
 
     };
@@ -115,11 +106,16 @@ CashCal.Week = (function () {
 CashCal.Forecast = (function () { // MVC: Model
     "use strict";
 
-    var week = [];
-
     return function Forecast() {
+        var week = [],
+            openingBalance = 0;
+
         this.addWeek = function addWeek(Week) {
             week[Week.weekNumber] = Week;
+        };
+
+        this.setOpeningBalance = function setOpeningBalance(balance) {
+            openingBalance = balance;
         };
     };
 
@@ -193,6 +189,10 @@ CashCal.ForecastController = (function () {
             week[weekNumber].addTransaction(name, value);
         };
 
+        this.setOpeningBalance = function setOpeningBalance(openingBalance) {
+            Forecast.setOpeningBalance(openingBalance);
+            ForecastView.setOpeningBalance(openingBalance);
+        };
     };
 }());
 
@@ -278,15 +278,13 @@ CashCal.WeekView = (function () {
             weekEntry;
 
         header.children()
-            .attr("data-balance", Week.closingBalance)
             .append(
                 $(document.createElement("th"))
-                    .attr("colspan", 2)
+                    .attr("colspan", 3)
                     .text("Week of " + new Intl.DateTimeFormat("default", {
                         month: "short",
                         day: "numeric"
-                    }).format(Week.weekStart)),
-                document.createElement("th")
+                    }).format(Week.weekStart))
             );
 
         transactions.attr("id", "week-" + Week.weekNumber);
@@ -315,11 +313,50 @@ CashCal.WeekView = (function () {
 CashCal.ForecastView = (function () {
     "use strict";
 
+    var mutationObserver = new MutationObserver(function (mutations) {
+        var value,
+            i;
+        for (i of mutations) {
+            if (i.attributeName === "data-balance") {
+                value = $(i.target).attr(i.attributeName);
+                if (value < 0) {
+                    value = "&minus; $" + value.slice(1);
+                } else {
+                    value = "<span style=\"color:white\">+</span> $" + value;
+                }
+                $(i.target).children().last().html(value);
+            }
+        }
+    });
+
     return function ForecastView(table) {
 
         if (!(this instanceof CashCal.ForecastView)) {
             return new CashCal.ForecastView(table);
         }
+
+        var openingBalance = $(document.createElement("tbody"))
+            .append($(document.createElement("tr"))
+                .append(
+                    $(document.createElement("td")).text("Opening balance")
+                        .attr("colspan", 2),
+                    document.createElement("td"), // TODO display value
+                )
+            );
+
+        table.append(openingBalance);
+        mutationObserver.observe(openingBalance.children()[0], {
+            attributes: true,
+            attributeFilter: [
+                "data-balance"
+            ],
+            childList: false,
+            subtree: false
+        });
+
+        this.setOpeningBalance = function setOpeningBalance(balance) {
+            openingBalance.children().attr("data-balance", balance);
+        };
 
         this.addWeek = function addWeek(WeekView) {
             table.append(WeekView);

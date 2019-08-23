@@ -55,6 +55,21 @@ CashCal.Week = (function () {
             }
 
             return ISOWeekStart;
+        },
+
+        /**
+         * @method calculateBalance
+         * @private
+         */
+        calculateBalance = function calculateBalance(balance, transactions) {
+            var i = 0,
+                length = transactions.length;
+
+            for (/*i = 0, length = transactions.length*/; i < length; i += 1) {
+                balance += transactions[i].value;
+            }
+
+            return balance;
         };
 
 
@@ -64,17 +79,6 @@ CashCal.Week = (function () {
         if (!(this instanceof CashCal.Week)) {
             return new CashCal.Week(weekNumber);
         }
-
-        var calculateBalance = function calculateBalance(balance, transactions) {
-                var i = 0,
-                    length = transactions.length;
-
-                for (/*i = 0, length = transactions.length*/; i < length; i += 1) {
-                    balance += transactions[i].value;
-                }
-
-                return balance;
-            };
 
         this.weekNumber = weekNumber;
         this.weekStart = getDateOfISOWeek(weekNumber, new Date().getFullYear());

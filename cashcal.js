@@ -209,7 +209,8 @@ CashCal.WeekView = (function () {
         var header = $(document.createElement("tbody"))
                 .addClass("thead-light")
                 .append(document.createElement("tr")),
-            transactions = $(document.createElement("tbody")),
+            transactions = $(document.createElement("tbody"))
+                .attr("id", "week-" + Week.weekNumber),
             weekEntry;
 
         header.children()
@@ -222,7 +223,6 @@ CashCal.WeekView = (function () {
                     }).format(Week.weekStart))
             );
 
-        transactions.attr("id", "week-" + Week.weekNumber);
 
         weekEntry = header.add(transactions);
 
@@ -274,16 +274,13 @@ CashCal.ForecastView = (function () {
                 .append(
                     $(document.createElement("td")).text("Opening balance")
                         .attr("colspan", 2),
-                    document.createElement("td"), // TODO display value
+                    document.createElement("td")
                 )
-            );
+            ).appendTo(table);
 
-        table.append(openingBalance);
         mutationObserver.observe(openingBalance.children()[0], {
             attributes: true,
-            attributeFilter: [
-                "data-balance"
-            ],
+            attributeFilter: ["data-balance"],
             childList: false,
             subtree: false
         });

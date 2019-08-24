@@ -57,23 +57,7 @@ CashCal.Week = (function () {
             }
 
             return ISOWeekStart;
-        },
-
-        /**
-         * @method calculateBalance
-         * @private
-         */
-        calculateBalance = function calculateBalance(balance, transactions) {
-            var i = 0,
-                length = transactions.length;
-
-            for (/*i = 0, length = transactions.length*/; i < length; i += 1) {
-                balance += transactions[i].value;
-            }
-
-            return balance;
         };
-
 
     // Constructor
     return function Week(weekNumber) {
@@ -84,23 +68,6 @@ CashCal.Week = (function () {
 
         this.weekNumber = weekNumber;
         this.weekStart = getDateOfISOWeek(weekNumber, new Date().getFullYear());
-        this.transactions = [];
-        this.addTransaction = function addTransaction(Transaction, index) {
-            index = (index > -1) ? index : this.transactions.length;
-            this.transactions.splice(index, 0, Transaction);
-            this.closingBalance = calculateBalance(this.openingBalance,
-                    this.transactions);
-                // TODO Notify controller about updated balance
-                // TODO record balances after each transaction for each txn?
-        },
-        this.removeTransaction = function removeTransaction(index) {
-            index = (index > -1) ? index : this.transactions.length - 1;
-            this.transactions.splice(index, 1);
-            this.closingBalance = calculateBalance(this.openingBalance,
-                    this.transactions);
-                // TODO Notify controller about updated balance
-                // TODO record balances after each transaction for each txn?
-        };
 
     };
 }());
@@ -112,8 +79,6 @@ CashCal.Forecast = (function () { // MVC: Model
         var week = [],
             openingBalance = 0;
 
-        this.addWeek = function addWeek(Week) {
-            week[Week.weekNumber] = Week;
         };
 
         this.setOpeningBalance = function setOpeningBalance(balance) {
@@ -142,31 +107,6 @@ CashCal.TransactionController = (function () {
 }());
 */
 
-/**
- * Expects a reference to the classes
- */
-CashCal.WeekController = (function () {
-    "use strict";
-
-    return function WeekController(model, view) {
-
-        if (!(this instanceof CashCal.WeekController)) {
-            return new CashCal.WeekController(model, view);
-        }
-
-        var transaction = [];
-
-        this.addTransaction = function addTransaction(name, value) {
-            var transactionModel = new CashCal.Transaction(name, value),
-                transactionView = new CashCal.TransactionView(transactionModel);
-
-            model.addTransaction(transactionModel);
-            view.addTransaction(transactionView);
-        };
-
-    };
-}());
-
 CashCal.ForecastController = (function () {
     "use strict";
 
@@ -176,19 +116,12 @@ CashCal.ForecastController = (function () {
             return new CashCal.ForecastControlle(ForecastView);
         }
 
-        var week = [];
-
-        this.addWeek = function addWeek(weekNumber) {
-            var weekModel = new CashCal.Week(weekNumber),
-                weekView = new CashCal.WeekView(weekModel);
-
-            week[weekNumber] = new CashCal.WeekController(weekModel, weekView);
-            Forecast.addWeek(weekModel);
-            ForecastView.addWeek(weekView);
-        };
-
         this.addTransaction = function addTransaction(weekNumber, name, value) {
-            week[weekNumber].addTransaction(name, value);
+            var transactionModel = new CashCal.Transaction(weekNumber, name, value),
+                transactionView = new CashCal.TransactionView(transactionModel);
+
+            Forecast.addTransaction(transactionModel);
+            ForecastView.addTransaction(transactionModel, transactionView);
         };
 
         this.setOpeningBalance = function setOpeningBalance(openingBalance) {
@@ -257,12 +190,12 @@ CashCal.TransactionView = (function () {
 }());
 
 /**
- * Expects Week object.
- * TODO if week exists, update week.
  *
  * @namespace CashCal
  * @class WeekView
  * @constructor
+ *
+ * @param Week {Week} Week object.
  */
 CashCal.WeekView = (function () {
     "use strict";
@@ -300,8 +233,6 @@ CashCal.WeekView = (function () {
 
         return weekEntry;
 
-        // TODO automatically include existing transactions
-
     };
 }());
 
@@ -315,21 +246,22 @@ CashCal.WeekView = (function () {
 CashCal.ForecastView = (function () {
     "use strict";
 
-    var mutationObserver = new MutationObserver(function (mutations) {
-        var value,
-            i;
-        for (i of mutations) {
-            if (i.attributeName === "data-balance") {
-                value = $(i.target).attr(i.attributeName);
-                if (value < 0) {
-                    value = "&minus; $" + value.slice(1);
-                } else {
-                    value = "<span style=\"color:white\">+</span> $" + value;
+    var week = [],
+        mutationObserver = new MutationObserver(function (mutations) {
+            var value,
+                i;
+            for (i of mutations) {
+                if (i.attributeName === "data-balance") {
+                    value = $(i.target).attr(i.attributeName);
+                    if (value < 0) {
+                        value = "&minus; $" + value.slice(1);
+                    } else {
+                        value = "<span style=\"color:white\">+</span> $" + value;
+                    }
+                    $(i.target).children().last().html(value);
                 }
-                $(i.target).children().last().html(value);
             }
-        }
-    });
+        });
 
     return function ForecastView(table) {
 
@@ -360,8 +292,22 @@ CashCal.ForecastView = (function () {
             openingBalance.children().attr("data-balance", balance);
         };
 
-        this.addWeek = function addWeek(WeekView) {
+        this.addWeek = function addWeek(Week, WeekView) {
+            week[Week.weekNumber] = WeekView;
             table.append(WeekView);
+            //TODO add weeks in any order
+        };
+
+        this.addTransaction = function addTransaction(Transaction, TransactionView) {
+            if (week[Transaction.week] === undefined) {
+                var weekModel = new CashCal.Week(Transaction.week),
+                    weekView = new CashCal.WeekView(weekModel);
+
+                this.addWeek(weekModel, weekView);
+                //FormController.addWeek(weekModel);
+            }
+
+            week[Transaction.week].addTransaction(TransactionView);
         };
     };
 }());

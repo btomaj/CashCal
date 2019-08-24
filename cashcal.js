@@ -1,3 +1,4 @@
+/*jslint devel */
 /**
  * @namespace CashCal
  */

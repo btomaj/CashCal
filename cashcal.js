@@ -16,14 +16,15 @@ CashCal.Transaction = (function () {
     // Private properties
 
     // Constructor
-    return function Transaction(name, value) {
+    return function Transaction(week, name, value) {
 
         if (!(this instanceof CashCal.Transaction)) {
-            return new CashCal.Transaction(name, value);
+            return new CashCal.Transaction(week, name, value);
         }
 
         this.name = name;
         this.value = value;
+        this.week = week;
 
     };
 

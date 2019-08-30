@@ -75,6 +75,11 @@ CashCal.Forecast = (function () { // MVC: Model
 
     return function Forecast() {
         var week = [],
+
+        if (!(this instanceof CashCal.Forecast)) {
+            return new CashCal.Forecast();
+        }
+
             openingBalance = 0;
 
         };
@@ -111,7 +116,7 @@ CashCal.ForecastController = (function () {
     return function ForecastController(Forecast, ForecastView) {
 
         if (!(this instanceof CashCal.ForecastController)) {
-            return new CashCal.ForecastControlle(ForecastView);
+            return new CashCal.ForecastControlle(Forecast, ForecastView);
         }
 
         this.addTransaction = function addTransaction(weekNumber, name, value) {

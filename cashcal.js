@@ -10,10 +10,8 @@ var CashCal = CashCal || {};
  * @param {string} name The name describing the transaction
  * @param {integer} value The value of the transaction
  */
-CashCal.Transaction = (function () {
+CashCal.Transaction = (function () { // MVC: Model
     "use strict";
-
-    // Private properties
 
     // Constructor
     return function Transaction(week, name, value) {
@@ -292,7 +290,6 @@ CashCal.ForecastView = (function () {
         this.addWeek = function addWeek(Week, WeekView) {
             week[Week.weekNumber] = WeekView;
             table.append(WeekView);
-            //TODO add weeks in any order
         };
 
         this.addTransaction = function addTransaction(Transaction, TransactionView) {

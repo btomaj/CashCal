@@ -148,6 +148,13 @@ CashCal.ForecastController = (function () {
                 view: weekView
             };
             ForecastView.addWeek(weekModel, weekView);
+            new Sortable.create(weekView[1], {
+                filter: ".table-secondary",
+                ghostClass: "table-primary",
+                group: "cashcal",
+                delay: 60,
+                delayOnTouchOnly: true
+            });
             //FormController.addWeek(weekModel);
         };
 

@@ -74,7 +74,6 @@ CashCal.Forecast = (function () { // MVC: Model
     "use strict";
 
     return function Forecast() {
-        var week = [],
 
         if (!(this instanceof CashCal.Forecast)) {
             return new CashCal.Forecast();
@@ -122,15 +121,34 @@ CashCal.ForecastController = (function () {
     return function ForecastController(Forecast, ForecastView) {
 
         if (!(this instanceof CashCal.ForecastController)) {
-            return new CashCal.ForecastControlle(Forecast, ForecastView);
+            return new CashCal.ForecastController(Forecast, ForecastView);
         }
+
+        // Private properties
+        var week = [];
 
         this.addTransaction = function addTransaction(weekNumber, name, value) {
             var transactionModel = new CashCal.Transaction(weekNumber, name, value),
                 transactionView = new CashCal.TransactionView(transactionModel);
 
+            if (week[weekNumber] === undefined) {
+                this.addWeek(weekNumber);
+            }
+
             Forecast.addTransaction(transactionModel);
             ForecastView.addTransaction(transactionModel, transactionView);
+        };
+
+        this.addWeek = function addWeek(weekNumber) {
+            var weekModel = new CashCal.Week(weekNumber),
+                weekView = new CashCal.WeekView(weekModel);
+
+            week[weekNumber] = {
+                model: weekModel,
+                view: weekView
+            };
+            ForecastView.addWeek(weekModel, weekView);
+            //FormController.addWeek(weekModel);
         };
 
         this.setOpeningBalance = function setOpeningBalance(openingBalance) {
@@ -309,14 +327,6 @@ CashCal.ForecastView = (function () {
         };
 
         this.addTransaction = function addTransaction(Transaction, TransactionView) {
-            if (week[Transaction.week] === undefined) {
-                var weekModel = new CashCal.Week(Transaction.week),
-                    weekView = new CashCal.WeekView(weekModel);
-
-                this.addWeek(weekModel, weekView);
-                //FormController.addWeek(weekModel);
-            }
-
             TransactionView.attr("data-balance", Transaction.balance);
             week[Transaction.week].addTransaction(TransactionView);
         };

@@ -80,8 +80,14 @@ CashCal.Forecast = (function () { // MVC: Model
             return new CashCal.Forecast();
         }
 
+        var transaction = [],
             openingBalance = 0;
 
+        this.addTransaction = function addTransaction(Transaction) {
+            var index = transaction.push(Transaction) - 1;
+
+            Transaction.balance = Transaction.value + (index > 0 ?
+                    transaction[index - 1].balance : openingBalance);
         };
 
         this.setOpeningBalance = function setOpeningBalance(balance) {
@@ -156,8 +162,13 @@ CashCal.TransactionView = (function () {
                         value = $(i.target).attr(i.attributeName);
                         if (value < 0) {
                             value = "&minus; $" + value.slice(1);
+                            if ($(i.target).attr("data-value") < 0) {
+                                $(i.target).addClass("table-danger");
+                            }
                         } else {
-                            value = "<span style=\"color:white\">+</span> $" + value;
+                            value = "<span style=\"color:white\">+</span> $" +
+                                    value;
+                                $(i.target).removeClass("table-danger");
                         }
                         $(i.target).children().last().html(value);
                         break;
@@ -306,6 +317,7 @@ CashCal.ForecastView = (function () {
                 //FormController.addWeek(weekModel);
             }
 
+            TransactionView.attr("data-balance", Transaction.balance);
             week[Transaction.week].addTransaction(TransactionView);
         };
     };

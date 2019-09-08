@@ -115,26 +115,6 @@ CashCal.Forecast = (function () { // MVC: Model
     };
 
 }());
-
-
-/*`
-CashCal.TransactionController = (function () {
-    "use strict";
-
-    return function TransactionController(model, view) {
-
-        if (!(this instanceof CashCal.TransactionController)) {
-            return new CashCal.TransactionController(model, view);
-        }
-    
-
-        this.addTransaction = function addTransaction(name, value) {
-        };
-    };
-
-}());
-*/
-
 CashCal.ForecastController = (function () {
     "use strict";
 

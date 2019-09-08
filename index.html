@@ -6,13 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
     <style>
-        .thead-light tr th:last-child:before {
-          content: "\2212\00A0";
-          color: #e9ecef;
-        }
-
         .modal-dialog {
           width: 100%;
           height: 100%;
@@ -91,47 +86,29 @@
     <script src="node_modules/sortablejs/Sortable.min.js"></script>
     <script src="cashcal.js"></script>
     <script>
-        var appMain = new CashCal.ForecastController(
-                new CashCal.Forecast(),
-                new CashCal.ForecastView($("table"))
-            );
-        
+        !function (window) {
+            var model = new CashCal.Forecast(),
+                view = new CashCal.ForecastView(model, $("table"));
 
-        appMain.addWeek(27);
-        appMain.addTransaction(27, "Uber (June)", -500);
-        appMain.addTransaction(27, "DJ City", -200);
+            window.appMain = new CashCal.ForecastController(model, view);
+            
+            window.appMain.setOpeningBalance(500);
 
-        appMain.addWeek(28);
-        appMain.addTransaction(28, "BT Insurance", -400);
-        appMain.addTransaction(28, "Invoice to Drew", 500);
-        appMain.addTransaction(28, "Invoice to Quentin", 1000);
+            window.appMain.addTransaction(27, "Uber (June)", -500);
+            window.appMain.addTransaction(27, "DJ City", -200);
 
+            window.appMain.addTransaction(28, "BT Insurance", -400);
+            window.appMain.addTransaction(28, "Invoice #00001", 500);
+            window.appMain.addTransaction(28, "Invoice #00002", 1000);
+        }(window);
 
-
-        function updateBalances() {
-            var balance = +document.querySelector("tr[data-balance]").dataset.balance, // only one element should have a data-balance attribute at the start
-                transaction = document.querySelectorAll("tr[data-value]"),
-                value = 0,
-                i = 0;
-
-            for (i = 0; i < transaction.length; i += 1) {
-                value = +transaction[i].dataset.value;
-                balance = balance + value,
-                $(transaction[i]).attr("data-balance", balance);
-
-                if (balance < 0 && value < 0) {
-                    $(transaction[i]).addClass("table-danger");
-                } else {
-                    $(transaction[i]).removeClass("table-danger");
-                }
-            }
-        }
-
+//        appMain.removeTransaction(transactionId);
 
         $("#addTransactionForm").submit(function (event) {
             event.preventDefault();
             event.stopPropagation();
 
+            // TODO This is broken, needs to be updated to new format
             var transaction = new CashCal.Transaction($(this).find("#transactionName").val(), $(this).find("#transactionValue").val());
 
             $("tbody").last().append(
@@ -146,29 +123,6 @@
         });
         $("#addTransaction .modal-header button").click(function (event) {
             $("#addTransactionForm").trigger("reset");
-        });
-
-        !function main() {
-            updateBalances();
-        }();
-    </script>
-    <script>
-        // Simple list
-        new Sortable.create(document.getElementById("week-27"), {
-            filter: ".table-secondary",
-            ghostClass: "table-primary",
-            group: "cashcal",
-            delay: 60,
-            delayOnTouchOnly: true,
-            onEnd: updateBalances
-        });
-        new Sortable.create(document.getElementById("week-28"), {
-            filter: ".table-secondary",
-            ghostClass: "table-primary",
-            group: "cashcal",
-            delay: 60,
-            delayOnTouchOnly: true,
-            onEnd: updateBalances
         });
     </script>
   </body>

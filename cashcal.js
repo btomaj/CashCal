@@ -100,8 +100,10 @@ CashCal.Forecast = (function () { // MVC: Model
         var transaction = [],
             openingBalance = 0;
 
-        this.addTransaction = function addTransaction(Transaction) {
-            var index = transaction.push(Transaction) - 1;
+        this.addTransaction = function addTransaction(Transaction, index) {
+            index = index || transaction.length;
+            transaction.splice(index, 0, Transaction);
+            // TODO add transaction to the end of its given week
 
             Transaction.balance = Transaction.value + (index > 0 ?
                     transaction[index - 1].balance : openingBalance);

@@ -63,8 +63,27 @@ CashCal.Week = (function () {
             return new CashCal.Week(weekNumber);
         }
 
+        // Private method
+        var transaction = [];
+
         this.weekNumber = weekNumber;
         this.weekStart = getDateOfISOWeek(weekNumber, new Date().getFullYear());
+
+        this.addTransaction = function addTransaction(Transaction, index) {
+            index = index || transaction.length;
+            transaction.splice(index, 0, Transaction);
+            return index;
+        };
+
+        this.removeTransaction = function removeTransaction(index) {
+            var Transaction = transaction.splice(index, 1);
+            Transaction = Transaction[0];
+            return Transaction;
+        };
+
+        this.getTransactionCount = function getTransactionCount() {
+            return transaction.length;
+        };
 
     };
 }());

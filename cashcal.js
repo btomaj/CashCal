@@ -309,8 +309,7 @@ CashCal.WeekView = (function () {
 CashCal.ForecastView = (function () {
     "use strict";
 
-    var week = [],
-        mutationObserver = new MutationObserver(function (mutations) {
+    var mutationObserver = new MutationObserver(function (mutations) {
             var value,
                 i;
             for (i of mutations) {
@@ -353,7 +352,6 @@ CashCal.ForecastView = (function () {
         };
 
         this.addWeek = function addWeek(Week, WeekView) {
-            week[Week.weekNumber] = WeekView;
             table.append(WeekView);
         };
 

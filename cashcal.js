@@ -88,6 +88,11 @@ CashCal.Week = (function () {
     };
 }());
 
+/**
+ * TODO move initialisation of model data from Controller to Model
+ *
+ * @class Forecast
+ */
 CashCal.Forecast = (function () { // MVC: Model
     "use strict";
 
@@ -109,60 +114,25 @@ CashCal.Forecast = (function () { // MVC: Model
                     transaction[index - 1].balance : openingBalance);
         };
 
+        this.moveTransaction = function moveTransaction(oldIndex, newIndex) {
+            var i = Math.min(oldIndex, newIndex),
+                j = Math.max(oldIndex, newIndex), 
+                Transaction = transaction.splice(oldIndex, 1);
+            Transaction = Transaction[0];
+
+            transaction.splice(newIndex, 0, Transaction);
+
+            for (; i <= j; i += 1) {
+                transaction[i].balance = transaction[i].value + (i > 0 ?
+                        transaction[i - 1].balance : openingBalance);
+            }
+        };
+
         this.setOpeningBalance = function setOpeningBalance(balance) {
             openingBalance = balance;
         };
     };
 
-}());
-CashCal.ForecastController = (function () {
-    "use strict";
-
-    return function ForecastController(Forecast, ForecastView) {
-
-        if (!(this instanceof CashCal.ForecastController)) {
-            return new CashCal.ForecastController(Forecast, ForecastView);
-        }
-
-        // Private properties
-        var week = [];
-
-        this.addTransaction = function addTransaction(weekNumber, name, value) {
-            var transactionModel = new CashCal.Transaction(weekNumber, name, value),
-                transactionView = new CashCal.TransactionView(transactionModel);
-
-            if (week[weekNumber] === undefined) {
-                this.addWeek(weekNumber);
-            }
-
-            Forecast.addTransaction(transactionModel);
-            ForecastView.addTransaction(transactionModel, transactionView);
-        };
-
-        this.addWeek = function addWeek(weekNumber) {
-            var weekModel = new CashCal.Week(weekNumber),
-                weekView = new CashCal.WeekView(weekModel);
-
-            week[weekNumber] = {
-                model: weekModel,
-                view: weekView
-            };
-            ForecastView.addWeek(weekModel, weekView);
-            new Sortable.create(weekView[1], {
-                filter: ".table-secondary",
-                ghostClass: "table-primary",
-                group: "cashcal",
-                delay: 60,
-                delayOnTouchOnly: true
-            });
-            //FormController.addWeek(weekModel);
-        };
-
-        this.setOpeningBalance = function setOpeningBalance(openingBalance) {
-            Forecast.setOpeningBalance(openingBalance);
-            ForecastView.setOpeningBalance(openingBalance);
-        };
-    };
 }());
 
 CashCal.TransactionView = (function () {
@@ -266,12 +236,10 @@ CashCal.WeekView = (function () {
                     }).format(Week.weekStart))
             );
 
-
         weekEntry = header.add(transactions);
 
         weekEntry.addTransaction = function addTransaction(TransactionView) {
             transactions.append(TransactionView);
-            // TODO update balance
         };
 
         return weekEntry;
@@ -333,11 +301,138 @@ CashCal.ForecastView = (function () {
 
         this.addWeek = function addWeek(Week, WeekView) {
             table.append(WeekView);
+            //TODO display weeks in correct order when added in any order
         };
 
+    };
+}());
+
+CashCal.WeekController = (function () {
+    "use strict";
+
+    return function WeekController(Week, WeekView) {
+
+        if (!(this instanceof CashCal.WeekController)) {
+            return new CashCal.WeekController(Week, WeekView);
+        }
+
         this.addTransaction = function addTransaction(Transaction, TransactionView) {
-            TransactionView.attr("data-balance", Transaction.balance);
-            week[Transaction.week].addTransaction(TransactionView);
+            WeekView.addTransaction(TransactionView);
+            return Week.addTransaction(Transaction);
+        };
+
+        this.removeTransaction = function removeTransaction(index) {
+            return Week.removeTransaction(index);
+        };
+
+        this.moveTransaction = function moveTransaction(Transaction, index) {
+            return Week.addTransaction(Transaction, index);
+        };
+
+        this.getTransactionCount = function getTransactionCount() {
+            return Week.getTransactionCount();
+        };
+
+    };
+}());
+
+CashCal.ForecastController = (function () {
+    "use strict";
+
+    return function ForecastController(Forecast, ForecastView) {
+
+        if (!(this instanceof CashCal.ForecastController)) {
+            return new CashCal.ForecastController(Forecast, ForecastView);
+        }
+
+        // Private properties
+        var transaction = [],
+            week = [],
+
+        // Private methods
+            addWeek = function addWeek(weekNumber, context) {
+                var weekModel = new CashCal.Week(weekNumber),
+                    weekView = new CashCal.WeekView(weekModel);
+
+                week[weekNumber] = new CashCal.WeekController(weekModel, weekView);
+
+                ForecastView.addWeek(weekModel, weekView);
+                new Sortable.create(weekView[1], {
+                    filter: ".table-secondary",
+                    ghostClass: "table-primary",
+                    group: "cashcal",
+                    delay: 60,
+                    delayOnTouchOnly: true,
+                    onEnd: function (e) {
+                        var fromWeekNumber = +e.from.id.substring(5),
+                            toWeekNumber = +e.to.id.substring(5),
+                            i, // int
+                            fromIndex = 0,
+                            toIndex = 0,
+                            Transaction;
+
+
+                        for (i = fromWeekNumber - 1; week[i]; i -= 1) {
+                            fromIndex += week[i].getTransactionCount();
+                        }
+                        fromIndex += e.oldIndex;
+
+                        for (i = toWeekNumber - 1; week[i]; i-= 1) {
+                            toIndex += week[i].getTransactionCount();
+                        }
+                        toIndex += e.newIndex;
+                        fromWeekNumber < toWeekNumber ? toIndex -= 1 : 0;
+
+                        Transaction = week[fromWeekNumber].removeTransaction(e.oldIndex);
+                        week[toWeekNumber].moveTransaction(Transaction, e.newIndex);
+                        context.moveTransaction(fromIndex, toIndex);
+                    }
+                });
+                //FormController.addWeek(weekModel);
+            };
+
+        this.addTransaction = function addTransaction(weekNumber, name, value) {
+            var index = 0, // int
+                weekIndex,
+                transactionModel = new CashCal.Transaction(name, value),
+                transactionView = new CashCal.TransactionView(transactionModel),
+                i = weekNumber;
+
+            if (week[weekNumber] === undefined) {
+                addWeek(weekNumber, this);
+            }
+
+            for (/*i = weekNumber*/; week[i]; i -= 1) {
+                index += week[i].getTransactionCount();
+            }
+
+            week[weekNumber].addTransaction(transactionModel, transactionView);
+            Forecast.addTransaction(transactionModel, index);
+            transaction.splice(index, 0, transactionView);
+            transactionView.updateBalance();
+        };
+
+
+        this.moveTransaction = function moveTransaction(oldIndex, newIndex) {
+            var i = Math.min(oldIndex, newIndex),
+                j = Math.max(oldIndex, newIndex),
+                Transaction = transaction.splice(oldIndex, 1);
+            Transaction = Transaction[0];
+
+            Forecast.moveTransaction(oldIndex, newIndex);
+            transaction.splice(newIndex, 0, Transaction);
+            for (; i <= j; i += 1) {
+                transaction[i].updateBalance();
+            }
+        };
+
+        /*this.setTransactionWeek = function setTransactionWeek(index, weekNumber) {
+            Forecast.setTransactionWeek(index, weekNumber);
+        };*/
+
+        this.setOpeningBalance = function setOpeningBalance(openingBalance) {
+            Forecast.setOpeningBalance(openingBalance);
+            ForecastView.setOpeningBalance(openingBalance);
         };
     };
 }());

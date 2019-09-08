@@ -244,6 +244,10 @@ CashCal.TransactionView = (function () {
         });
         transactionEntry.attr("data-value", Transaction.value);
 
+        transactionEntry.updateBalance = function updateBalance() {
+            this.attr("data-balance", Transaction.balance);
+        };
+
         return transactionEntry;
     };
 }());

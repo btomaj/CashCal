@@ -14,15 +14,14 @@ CashCal.Transaction = (function () { // MVC: Model
     "use strict";
 
     // Constructor
-    return function Transaction(week, name, value) {
+    return function Transaction(name, value) {
 
         if (!(this instanceof CashCal.Transaction)) {
-            return new CashCal.Transaction(week, name, value);
+            return new CashCal.Transaction(name, value);
         }
 
         this.name = name;
         this.value = value;
-        this.week = week;
 
     };
 

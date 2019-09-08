@@ -302,10 +302,10 @@ CashCal.ForecastView = (function () {
             }
         });
 
-    return function ForecastView(table) {
+    return function ForecastView(Forecast, table) {
 
         if (!(this instanceof CashCal.ForecastView)) {
-            return new CashCal.ForecastView(table);
+            return new CashCal.ForecastView(Forecast, table);
         }
 
         var openingBalance = $(document.createElement("tbody"))

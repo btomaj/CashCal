@@ -347,50 +347,9 @@ CashCal.ForecastController = (function () {
 
         // Private properties
         var transaction = [],
-            week = [],
+            week = [];
 
         // Private methods
-            addWeek = function addWeek(weekNumber, context) {
-                var weekModel = new CashCal.Week(weekNumber),
-                    weekView = new CashCal.WeekView(weekModel);
-
-                week[weekNumber] = new CashCal.WeekController(weekModel, weekView);
-
-                ForecastView.addWeek(weekModel, weekView);
-                new Sortable.create(weekView[1], {
-                    filter: ".table-secondary",
-                    ghostClass: "table-primary",
-                    group: "cashcal",
-                    delay: 60,
-                    delayOnTouchOnly: true,
-                    onEnd: function (e) {
-                        var fromWeekNumber = +e.from.id.substring(5),
-                            toWeekNumber = +e.to.id.substring(5),
-                            i, // int
-                            fromIndex = 0,
-                            toIndex = 0,
-                            Transaction;
-
-
-                        for (i = fromWeekNumber - 1; week[i]; i -= 1) {
-                            fromIndex += week[i].getTransactionCount();
-                        }
-                        fromIndex += e.oldIndex;
-
-                        for (i = toWeekNumber - 1; week[i]; i-= 1) {
-                            toIndex += week[i].getTransactionCount();
-                        }
-                        toIndex += e.newIndex;
-                        fromWeekNumber < toWeekNumber ? toIndex -= 1 : 0;
-
-                        Transaction = week[fromWeekNumber].removeTransaction(e.oldIndex);
-                        week[toWeekNumber].moveTransaction(Transaction, e.newIndex);
-                        context.moveTransaction(fromIndex, toIndex);
-                    }
-                });
-                //FormController.addWeek(weekModel);
-            };
-
         this.addTransaction = function addTransaction(weekNumber, name, value) {
             var index = 0, // int
                 weekIndex,
@@ -399,7 +358,7 @@ CashCal.ForecastController = (function () {
                 i = weekNumber;
 
             if (week[weekNumber] === undefined) {
-                addWeek(weekNumber, this);
+                this.addWeek(weekNumber);
             }
 
             for (/*i = weekNumber*/; week[i]; i -= 1) {
@@ -411,7 +370,6 @@ CashCal.ForecastController = (function () {
             transaction.splice(index, 0, transactionView);
             transactionView.updateBalance();
         };
-
 
         this.moveTransaction = function moveTransaction(oldIndex, newIndex) {
             var i = Math.min(oldIndex, newIndex),
@@ -426,9 +384,51 @@ CashCal.ForecastController = (function () {
             }
         };
 
-        /*this.setTransactionWeek = function setTransactionWeek(index, weekNumber) {
-            Forecast.setTransactionWeek(index, weekNumber);
-        };*/
+        this.addWeek = function addWeek(weekNumber) {
+            var weekModel = new CashCal.Week(weekNumber),
+                weekView = new CashCal.WeekView(weekModel),
+                context = this;
+
+            week[weekNumber] = new CashCal.WeekController(weekModel, weekView);
+
+            ForecastView.addWeek(weekModel, weekView);
+            new Sortable.create(weekView[1], {
+                filter: ".table-secondary",
+                ghostClass: "table-primary",
+                group: "cashcal",
+                delay: 60,
+                delayOnTouchOnly: true,
+                onEnd: function (e) {
+                    var fromWeekNumber = +e.from.id.substring(5),
+                        toWeekNumber = +e.to.id.substring(5),
+                        i, // int
+                        fromIndex = 0,
+                        toIndex = 0,
+                        Transaction;
+
+                    // Get transaction count of previous weeks then add index
+                    for (i = fromWeekNumber - 1; week[i]; i -= 1) {
+                        fromIndex += week[i].getTransactionCount();
+                    }
+                    fromIndex += e.oldIndex;
+
+                    for (i = toWeekNumber - 1; week[i]; i-= 1) {
+                        toIndex += week[i].getTransactionCount();
+                    }
+                    toIndex += e.newIndex;
+
+                    // Don't count Transaction in index when moving it forward
+                    if (fromWeekNumber < toWeekNumber) {
+                        toIndex -= 1;
+                    }
+
+                    Transaction = week[fromWeekNumber].removeTransaction(e.oldIndex);
+                    week[toWeekNumber].moveTransaction(Transaction, e.newIndex);
+                    context.moveTransaction(fromIndex, toIndex);
+                }
+            });
+            //FormController.addWeek(weekModel);
+        };
 
         this.setOpeningBalance = function setOpeningBalance(openingBalance) {
             Forecast.setOpeningBalance(openingBalance);

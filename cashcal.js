@@ -1,5 +1,6 @@
 /*jslint devel */
 /**
+ * XXX Fix bug that allows text selection after drag event
  * @namespace CashCal
  */
 var CashCal = CashCal || {};
@@ -116,9 +117,9 @@ CashCal.Forecast = (function () { // MVC: Model
 
         this.moveTransaction = function moveTransaction(oldIndex, newIndex) {
             var i = Math.min(oldIndex, newIndex),
-                j = Math.max(oldIndex, newIndex), 
+                j = Math.max(oldIndex, newIndex),
                 Transaction = transaction.splice(oldIndex, 1);
-            Transaction = Transaction[0];
+            Transaction = Transaction[0]; // Chrome bug
 
             transaction.splice(newIndex, 0, Transaction);
 

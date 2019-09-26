@@ -1,6 +1,7 @@
 /*jslint devel */
 /**
  * XXX Fix bug that allows text selection after drag event
+ * TODO Automatically add the correct weeks to the input form
  * @namespace CashCal
  */
 var CashCal = CashCal || {};
@@ -109,7 +110,6 @@ CashCal.Forecast = (function () { // MVC: Model
         this.addTransaction = function addTransaction(Transaction, index) {
             index = index || transaction.length;
             transaction.splice(index, 0, Transaction);
-            // TODO add transaction to the end of its given week
 
             Transaction.balance = Transaction.value + (index > 0 ?
                     transaction[index - 1].balance : openingBalance);

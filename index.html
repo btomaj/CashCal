@@ -66,7 +66,14 @@
                     <input type="text" class="form-control" id="transactionValue" name="transactionValue" placeholder="E.g. -100" required pattern="-?[0-9]+">
                   </div>
               </div>
-              </form>
+              <div class="form-group">
+                <label for="transactionWeek">Week</label>
+                <select class="form-control" id="transactionWeek">
+                  <option>27</option>
+                  <option>28</option>
+                </select>
+              </div>
+            </form>
           </div>
           <div class="modal-footer">
             <button type="submit" form="addTransactionForm" class="btn btn-primary">Add</button>
@@ -109,17 +116,13 @@
             event.stopPropagation();
 
             // TODO This is broken, needs to be updated to new format
-            var transaction = new CashCal.Transaction($(this).find("#transactionName").val(), $(this).find("#transactionValue").val());
-
-            $("tbody").last().append(
-                $(document.createElement("tr")).attr("data-value", $(this).find("#transactionValue").val()).append(
-                    $(document.createElement("td")).text($(this).find("#transactionName").val()),
-                    $(document.createElement("td")),
-                    $(document.createElement("td"))
-                )
+            window.appMain.addTransaction(
+                +$(this).find("#transactionWeek").val(),
+                $(this).find("#transactionName").val(),
+                +$(this).find("#transactionValue").val()
             );
+
             $("#addTransaction .modal-header button").trigger("click");
-            updateBalances();
         });
         $("#addTransaction .modal-header button").click(function (event) {
             $("#addTransactionForm").trigger("reset");

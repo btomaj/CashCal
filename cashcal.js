@@ -317,17 +317,18 @@ CashCal.WeekController = (function () {
             return new CashCal.WeekController(Week, WeekView);
         }
 
-        this.addTransaction = function addTransaction(Transaction, TransactionView) {
-            WeekView.addTransaction(TransactionView);
-            return Week.addTransaction(Transaction);
+        this.addTransaction = function addTransaction(Transaction, TransactionView, index) {
+            index = index || Week.getTransactionCount();
+
+            if (TransactionView) {
+                WeekView.addTransaction(TransactionView);
+            }
+
+            return Week.addTransaction(Transaction, index);
         };
 
         this.removeTransaction = function removeTransaction(index) {
             return Week.removeTransaction(index);
-        };
-
-        this.moveTransaction = function moveTransaction(Transaction, index) {
-            return Week.addTransaction(Transaction, index);
         };
 
         this.getTransactionCount = function getTransactionCount() {
@@ -424,7 +425,7 @@ CashCal.ForecastController = (function () {
                     }
 
                     Transaction = week[fromWeekNumber].removeTransaction(e.oldIndex);
-                    week[toWeekNumber].moveTransaction(Transaction, e.newIndex);
+                    week[toWeekNumber].addTransaction(Transaction, null, e.newIndex);
                     context.moveTransaction(fromIndex, toIndex);
                 }
             });
